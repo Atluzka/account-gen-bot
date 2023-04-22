@@ -1,9 +1,13 @@
-import discord, os, glob
+import discord, os, glob, json
 from discord.ext import commands
 
 bot = commands.Bot(command_prefix=[".", "$"], intents=discord.Intents.all())
 bot.remove_command('help')
 directory = os.getcwd()
+
+configfile = open('config.json')
+config = json.load(configfile)
+embed_color = 0x2b2d31
 
 def getFileName(file):
     file_name = file.split('\\', -1)[-1]
@@ -23,7 +27,7 @@ async def on_ready():
 
 # make sure your acc lists are mail:pass or user:pass
 # or this might not work the way it is intended to.
-@bot.slash_command(name="gen", description="Generate an account.")
+@bot.slash_command(name="gen", description="Generate an account.", guild_ids=[config['guild-id']])
 async def gen(interaction: discord.Interaction, account: str):
     channel = await interaction.user.create_dm()
     for file in glob.glob(directory + '/accounts/*.txt'):
@@ -42,25 +46,25 @@ async def gen(interaction: discord.Interaction, account: str):
                 fp.writelines(lines[1:])
             genembed=discord.Embed(title="Generated Account - " + file_name,
                         description="```" + acc_line +"```",
-                        color=0x2B2D31)
+                        color=embed_color)
             genembed.set_footer(text="github.com/Atluzka/account-gen-bot")
             await channel.send(embed=genembed)
             await interaction.response.send_message("Generated account has been sent to your DMs")
             return
     await interaction.response.send_message("account not found")
 
-@bot.slash_command(name="stock", description="Get the amount of stock.")
+@bot.slash_command(name="stock", description="Get the amount of stock.", guild_ids=[config['guild-id']])
 async def stock(ctx):
     
     account_list = getAccs()
     
     embed=discord.Embed(title="Stock",
                         description="All the currently available accounts to be generated.",
-                        color=0x2B2D31)
+                        color=embed_color)
     embed.set_footer(text="github.com/Atluzka/account-gen-bot")
     for i in account_list:
         rndmlist1 = i.split(":", 1)
         embed.add_field(name=rndmlist1[0].upper(), value="Stock: `" + rndmlist1[1] + "`", inline=True)
     await ctx.respond(embed=embed)
        
-bot.run("YOUR DISCORD TOKEN HERE")
+bot.run(config['token'])
