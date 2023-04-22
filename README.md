@@ -1,7 +1,6 @@
 Disclaimer: This bot doesn't generate accounts out of thin air, you need stock.
 ## Info
-I haven't tested this but it might have some optimization issues with big files (2mb+) but otherwise it works well.
-
+I haven't tested this but it might have some optimization issues with big files (2mb+) but otherwise it works well.     
 It deletes the account it generates. So the accounts are unique and people can't get the same account twice.
 
 ## How to use?
