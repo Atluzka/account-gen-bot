@@ -24,14 +24,18 @@ async def on_ready():
 # make sure your acc lists are mail:pass or user:pass
 # or this might not work the way it is intended to.
 @bot.slash_command(name="gen", description="Generate an account.")
-async def gen(ctx, account: str):
+async def gen(interaction: discord.Interaction, account: str):
+    channel = await interaction.user.create_dm()
     for file in glob.glob(directory + '/accounts/*.txt'):
         file_name = file.split('\\', -1)[-1]
         file_name = file_name.split('.', -1)[0]
         # honestly what the fuck is this shit, idk if its optimized enough for big text files
-        if file_name == account.lower():
+        if file_name.lower() == account.lower():
+            if os.stat(file).st_size == 0:
+                await interaction.response.send_message("`" + file_name.upper() + "` is out of stock.")
+                return
             with open(file, "r+") as fp:
-                lines = fp.readlines()
+                lines = fp.readlines() 
                 acc_line = lines[0]
                 fp.seek(0)
                 fp.truncate()
@@ -39,9 +43,11 @@ async def gen(ctx, account: str):
             genembed=discord.Embed(title="Generated Account - " + file_name,
                         description="```" + acc_line +"```",
                         color=0x2B2D31)
-            await ctx.respond(embed=genembed)
+            genembed.set_footer(text="github.com/Atluzka/account-gen-bot")
+            await channel.send(embed=genembed)
+            await interaction.response.send_message("Generated account has been sent to your DMs")
             return
-    await ctx.respond("account not found")
+    await interaction.response.send_message("account not found")
 
 @bot.slash_command(name="stock", description="Get the amount of stock.")
 async def stock(ctx):
@@ -51,9 +57,10 @@ async def stock(ctx):
     embed=discord.Embed(title="Stock",
                         description="All the currently available accounts to be generated.",
                         color=0x2B2D31)
+    embed.set_footer(text="github.com/Atluzka/account-gen-bot")
     for i in account_list:
         rndmlist1 = i.split(":", 1)
-        embed.add_field(name=rndmlist1[0], value="Stock: `" + rndmlist1[1] + "`", inline=False)
+        embed.add_field(name=rndmlist1[0].upper(), value="Stock: `" + rndmlist1[1] + "`", inline=True)
     await ctx.respond(embed=embed)
        
-bot.run("DISCORD TOKEN HERE")
+bot.run("YOUR DISCORD TOKEN HERE")
