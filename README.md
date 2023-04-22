@@ -16,5 +16,6 @@ You can also check stock by doing /stock
 * Better optimization for bigger txt files.   
 * Maybe make the message look a bit nicer.    
 * Send the account into dms
-* Maybe add a cooldown to gen command
+* Maybe add a cooldown to gen command   
+
 cant think of anything else atm
