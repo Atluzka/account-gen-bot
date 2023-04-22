@@ -12,7 +12,7 @@ To generate accounts just use
 
 You can also check stock by doing /stock
 
-## Screenshots
+## Screenshots (old)
 
 ![App Screenshot](https://github.com/Atluzka/account-gen-bot/blob/main/generated_picture.png?raw=true)
 
