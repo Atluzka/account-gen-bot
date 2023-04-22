@@ -14,9 +14,9 @@ You can also check stock by doing /stock
 
 ## Screenshots
 
-![App Screenshot](https://raw.githubusercontent.com/Atluzka/account-gen-bot/main/generated_picture.png?token=GHSAT0AAAAAAB6363GIP7ZR6ZHXMEHIBMBAZCDVM6A)
+![App Screenshot](https://github.com/Atluzka/account-gen-bot/blob/main/generated_picture.png?raw=true)
 
-![App Screenshot](https://raw.githubusercontent.com/Atluzka/account-gen-bot/main/stock_picture.png?token=GHSAT0AAAAAAB6363GJLVUN7QKSCFXATQ3SZCDVMOA)
+![App Screenshot](https://github.com/Atluzka/account-gen-bot/blob/main/stock_picture.png?raw=true)
 
 ## To do
 * Better optimization for bigger txt files.   
