@@ -12,6 +12,12 @@ To generate accounts just use
 
 You can also check stock by doing /stock
 
+## Screenshots
+
+![App Screenshot](https://raw.githubusercontent.com/Atluzka/account-gen-bot/main/generated_picture.png?token=GHSAT0AAAAAAB6363GIP7ZR6ZHXMEHIBMBAZCDVM6A)
+
+![App Screenshot](https://raw.githubusercontent.com/Atluzka/account-gen-bot/main/stock_picture.png?token=GHSAT0AAAAAAB6363GJLVUN7QKSCFXATQ3SZCDVMOA)
+
 ## To do
 * Better optimization for bigger txt files.   
 * Maybe make the message look a bit nicer.    
