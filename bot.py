@@ -108,8 +108,8 @@ async def gencmd_error(interaction: discord.Interaction, error):
 async def stock(ctx):
     
     service_num = 0
-    embed=discord.Embed(title="Stock", #service_num + 
-                        description="All accounts available to be generated.", #'\n'.join(new_acc_list)
+    embed=discord.Embed(title="Stock",
+                        description="All accounts available to be generated.",
                         color=embed_color)
     
     p = False
@@ -134,8 +134,6 @@ async def stock(ctx):
 
     embed.title = "Stock - " + str(service_num) +  " Services"
     
-
-    #embed.add_field("Free Accounts")
     embed.set_footer(text="github.com/Atluzka/account-gen-bot")
     await ctx.respond(embed=embed)
 
