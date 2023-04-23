@@ -7,6 +7,8 @@ directory = os.getcwd()
 
 configfile = open('config.json')
 config = json.load(configfile)
+
+#didnt work when i added this to the config file. might work with json5
 embed_color = 0x2b2d31
 
 def getFileName(file):
@@ -24,16 +26,14 @@ def getAccs():
 @bot.event
 async def on_ready():
     print("Bot: {0.user}".format(bot))
-
-# make sure your acc lists are mail:pass or user:pass
-# or this might not work the way it is intended to.
+    
 @bot.slash_command(name="gen", description="Generate an account.", guild_ids=[config['guild-id']])
 async def gen(interaction: discord.Interaction, account: str):
     channel = await interaction.user.create_dm()
     for file in glob.glob(directory + '/accounts/*.txt'):
         file_name = file.split('\\', -1)[-1]
         file_name = file_name.split('.', -1)[0]
-        # honestly what the fuck is this shit, idk if its optimized enough for big text files
+
         if file_name.lower() == account.lower():
             if os.stat(file).st_size == 0:
                 await interaction.response.send_message("`" + file_name.upper() + "` is out of stock.")
@@ -51,20 +51,23 @@ async def gen(interaction: discord.Interaction, account: str):
             await channel.send(embed=genembed)
             await interaction.response.send_message("Generated account has been sent to your DMs")
             return
-    await interaction.response.send_message("account not found")
+    await interaction.response.send_message("Service not found")
 
 @bot.slash_command(name="stock", description="Get the amount of stock.", guild_ids=[config['guild-id']])
 async def stock(ctx):
     
     account_list = getAccs()
-    
-    embed=discord.Embed(title="Stock",
-                        description="All the currently available accounts to be generated.",
-                        color=embed_color)
-    embed.set_footer(text="github.com/Atluzka/account-gen-bot")
+    new_acc_list = []
     for i in account_list:
         rndmlist1 = i.split(":", 1)
-        embed.add_field(name=rndmlist1[0].upper(), value="Stock: `" + rndmlist1[1] + "`", inline=True)
+        rndmlist1[1] = "`" + rndmlist1[1] + "`"
+        new_acc_list.append(rndmlist1[0].upper() + " -> " + rndmlist1[1])
+
+    
+    embed=discord.Embed(title="Stock - " + str(len(new_acc_list)) + " Services",
+                        description='\n'.join(new_acc_list),
+                        color=embed_color)
+    embed.set_footer(text="github.com/Atluzka/account-gen-bot")
     await ctx.respond(embed=embed)
        
 bot.run(config['token'])
