@@ -19,7 +19,9 @@ You can also check stock by doing /stock
 ![App Screenshot](https://github.com/Atluzka/account-gen-bot/blob/main/stock_picture.png?raw=true)
 
 ## To do
-* Better optimization for bigger txt files.    
-* Maybe add a cooldown to gen command   
+* add admin role commands
+* add account via commands
+* make new services via commands
+* logs  
 
 cant think of anything else atm
