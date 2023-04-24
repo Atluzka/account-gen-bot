@@ -1,5 +1,8 @@
 {
   "guild-id": "",
   "token": "",
-  "premium-role-id": ""
+  "premium-role-id": "",
+  "premium-cooldown": false,
+  "premium-cooldown-duration": 3,
+  "cooldown-duration": 10
 }
