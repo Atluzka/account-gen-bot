@@ -1,7 +1,11 @@
 Disclaimer: This bot doesn't generate accounts out of thin air, you need stock.
 ## Info
-I haven't tested this but it might have some optimization issues with big files (2mb+) but otherwise it works well.     
-It deletes the account it generates. So the accounts are unique and people can't get the same account twice.
+* Able to have premium and free gen
+* Customizable cooldown for premium & free users
+* Add stock without restarting bot. 
+* Delete accounts from stock after generated.
+
+Many more features to come.
 
 ## How to use?
 Its simple, all you have to do is put your accounts into the accounts folder, user:pass or mail:pass. They need to be in a .txt file otherwise the bot cant find them. There is also a example.txt file inside accounts folder.
