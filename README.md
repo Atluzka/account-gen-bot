@@ -19,9 +19,9 @@ You can also check stock by doing /stock
 
 ## Screenshots (old)
 
-![App Screenshot](https://github.com/Atluzka/account-gen-bot/blob/main/generated_picture.png?raw=true)
+![App Screenshot](https://cdn.discordapp.com/attachments/935502421780750376/1100002143320166410/generated_picture.png)
 
-![App Screenshot](https://github.com/Atluzka/account-gen-bot/blob/main/stock_picture.png?raw=true)
+![App Screenshot](https://cdn.discordapp.com/attachments/935502421780750376/1100002121203597352/stock_picture.png)
 
 ## To do
 * add admin role commands
