@@ -8,11 +8,12 @@ Disclaimer: This bot doesn't generate accounts out of thin air, you need stock.
 Many more features to come.
 
 ## How to use?
-Its simple, all you have to do is put your accounts into the accounts folder, user:pass or mail:pass. They need to be in a .txt file otherwise the bot cant find them. There is also a example.txt file inside accounts folder.
+Its simple, create your bot in discord.dev. Put the discord bot token into config.json file then put your guild-id that your bot is in and you're done. To add accounts simply create .txt files and put your accounts in them mail:pass or user:pass. You can also add full capture there, since the bot copies the full line and sends it to the user who generated the account.
 
 To generate accounts just use 
 
     /gen [name of the text file, without the .txt at the end]
+    /pgen - for premium users
 
 You can also check stock by doing /stock
 
