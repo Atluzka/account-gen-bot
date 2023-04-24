@@ -48,6 +48,7 @@ async def on_ready():
     print("Bot: {0.user}".format(bot))
     
 @bot.slash_command(name="gen", description="Generate an account.", guild_ids=[config['guild-id']])
+@commands.cooldown(1, config['cooldown-duration'], commands.BucketType.user)
 async def gen(interaction: discord.Interaction, account: str):
     channel = await interaction.user.create_dm()
     for file in glob.glob(directory + '/accounts/*.txt'):
@@ -57,39 +58,17 @@ async def gen(interaction: discord.Interaction, account: str):
             if os.stat(file).st_size == 0:
                 await interaction.response.send_message("`" + file_name.upper() + "` is out of stock.")
                 return
-            with open(file, "r+") as fp:
-                lines = fp.readlines() 
-                acc_line = lines[0]
-                fp.seek(0)
-                fp.truncate()
-                fp.writelines(lines[1:])
+            with open(file, "r+", encoding = "utf-8") as fp:
+                fp.seek(0, os.SEEK_END)
+                pos = fp.tell() - 1
+                while pos > 0 and fp.read(1) != "\n":
+                    pos -= 1
+                    fp.seek(pos, os.SEEK_SET)
+                acc_line = fp.readline()
+                if pos > 0:
+                    fp.seek(pos, os.SEEK_SET)
+                    fp.truncate()
             genembed=discord.Embed(title="Generated Account - " + file_name,
-                        description="```" + acc_line +"```",
-                        color=embed_color)
-            genembed.set_footer(text="github.com/Atluzka/account-gen-bot")
-            await channel.send(embed=genembed)
-            await interaction.response.send_message("Generated account has been sent to your DMs")
-            return
-    await interaction.response.send_message("Service not found")
-
-@bot.slash_command(name="pgen", description="Generate an premium account.", guild_ids=[config['guild-id']])
-@commands.has_role(int(config['premium-role-id']))
-async def gen(interaction: discord.Interaction, account: str):
-    channel = await interaction.user.create_dm()
-    for file in glob.glob(directory + '/paccounts/*.txt'):
-        file_name = file.split('\\', -1)[-1]
-        file_name = file_name.split('.', -1)[0]
-        if file_name.lower() == account.lower():
-            if os.stat(file).st_size == 0:
-                await interaction.response.send_message("`" + file_name.upper() + "` is out of stock.")
-                return
-            with open(file, "r+") as fp:
-                lines = fp.readlines() 
-                acc_line = lines[0]
-                fp.seek(0)
-                fp.truncate()
-                fp.writelines(lines[1:])
-            genembed=discord.Embed(title="Premium Generated Account - " + file_name,
                         description="```" + acc_line +"```",
                         color=embed_color)
             genembed.set_footer(text="github.com/Atluzka/account-gen-bot")
@@ -100,8 +79,56 @@ async def gen(interaction: discord.Interaction, account: str):
 
 @gen.error
 async def gencmd_error(interaction: discord.Interaction, error):
+    if isinstance(error, commands.CommandOnCooldown):
+        await interaction.response.send_message(f'This command is on cooldown. Please try again in {error.retry_after:.2f} seconds.')
+
+# i know that ctx isnt used, but the code FOR SOME FUCKING REASON doesn't work without it.
+def premium_cooldown(ctx): 
+    if config['premium-cooldown']:
+        return None
+    else:
+        return commands.Cooldown(1, config['premium-cooldown-duration'])
+
+@bot.slash_command(name="pgen", description="Generate an premium account.", guild_ids=[config['guild-id']])
+@commands.has_role(int(config['premium-role-id']))
+@commands.dynamic_cooldown(premium_cooldown, type=commands.BucketType.user)
+async def pgen(interaction: discord.Interaction, account: str):
+    channel = await interaction.user.create_dm()
+    for file in glob.glob(directory + '/paccounts/*.txt'):
+        file_name = file.split('\\', -1)[-1]
+        file_name = file_name.split('.', -1)[0]
+        if file_name.lower() == account.lower():
+            if os.stat(file).st_size == 0:
+                await interaction.response.send_message("`" + file_name.upper() + "` is out of stock.")
+                return
+            with open(file, "r+", encoding = "utf-8") as fp:
+                fp.seek(0, os.SEEK_END)
+                pos = fp.tell() - 1
+                while pos > 0 and fp.read(1) != "\n":
+                    pos -= 1
+                    fp.seek(pos, os.SEEK_SET)
+                acc_line = fp.readline()
+                if pos > 0:
+                    fp.seek(pos, os.SEEK_SET)
+                    fp.truncate()
+            genembed=discord.Embed(title="Premium Generated Account - " + file_name,
+                        description="```" + acc_line +"```",
+                        color=embed_color)
+            genembed.set_footer(text="github.com/Atluzka/account-gen-bot")
+            await channel.send(embed=genembed)
+            await interaction.response.send_message("Generated account has been sent to your DMs")
+            return
+    await interaction.response.send_message("Service not found")
+
+@pgen.error
+async def gencmd_error(interaction: discord.Interaction, error):
     if isinstance(error, commands.MissingRole):
         await interaction.response.send_message("You don't have access to this command.")
+
+@pgen.error
+async def gencmd_error(interaction: discord.Interaction, error):
+    if isinstance(error, commands.CommandOnCooldown):
+        await interaction.response.send_message(f'This command is on cooldown. Please try again in {error.retry_after:.2f} seconds.')
 
 
 @bot.slash_command(name="stock", description="Get the amount of stock.", guild_ids=[config['guild-id']])
