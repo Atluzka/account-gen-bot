@@ -1,7 +1,7 @@
 import discord, os, glob, json
 from discord.ext import commands
 
-bot = commands.Bot(command_prefix=[".", "$"], intents=discord.Intents.all())
+bot = commands.Bot(intents=discord.Intents.all())
 bot.remove_command('help')
 directory = os.getcwd()
 
