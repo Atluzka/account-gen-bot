@@ -19,9 +19,9 @@ You can also check stock by doing /stock
 
 ## Screenshots (old)
 
-<picture>
-    <img alt="Shows an illustrated sun in light mode and a moon with stars in dark mode." src="https://user-images.githubusercontent.com/52002842/234378827-654a8c7c-a274-4ec4-b93a-836e35ace6cb.png">
-</picture>
+![App Screenshot](https://cdn.discordapp.com/attachments/935502421780750376/1100002143320166410/generated_picture.png)
+
+![App Screenshot](https://cdn.discordapp.com/attachments/935502421780750376/1100002121203597352/stock_picture.png)
 
 ## To do
 * add admin role commands
