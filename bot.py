@@ -46,9 +46,15 @@ def accountDisplay(account_list):
 @bot.event
 async def on_ready():
     print("Bot: {0.user}".format(bot))
-    
+
+def normal_cooldown(ctx): 
+    if not config['admin-cooldown'] and ctx.author.guild_permissions.administrator:
+        return None
+    else:
+        return commands.Cooldown(1, config['cooldown-duration'])
+
 @bot.slash_command(name="gen", description="Generate an account.", guild_ids=[config['guild-id']])
-@commands.cooldown(1, config['cooldown-duration'], commands.BucketType.user)
+@commands.dynamic_cooldown(normal_cooldown, type=commands.BucketType.user)
 async def gen(interaction: discord.Interaction, account: str):
     channel = await interaction.user.create_dm()
     for file in glob.glob(directory + '/accounts/*.txt'):
@@ -82,9 +88,10 @@ async def gencmd_error(interaction: discord.Interaction, error):
     if isinstance(error, commands.CommandOnCooldown):
         await interaction.response.send_message(f'This command is on cooldown. Please try again in {error.retry_after:.2f} seconds.')
 
-# i know that ctx isnt used, but the code FOR SOME FUCKING REASON doesn't work without it.
-def premium_cooldown(ctx): 
-    if config['premium-cooldown']:
+def premium_cooldown(ctx):
+    if not config['admin-cooldown'] and ctx.author.guild_permissions.administrator:
+        return None
+    elif config['premium-cooldown']:
         return None
     else:
         return commands.Cooldown(1, config['premium-cooldown-duration'])
@@ -124,10 +131,7 @@ async def pgen(interaction: discord.Interaction, account: str):
 async def gencmd_error(interaction: discord.Interaction, error):
     if isinstance(error, commands.MissingRole):
         await interaction.response.send_message("You don't have access to this command.")
-
-@pgen.error
-async def gencmd_error(interaction: discord.Interaction, error):
-    if isinstance(error, commands.CommandOnCooldown):
+    elif isinstance(error, commands.CommandOnCooldown):
         await interaction.response.send_message(f'This command is on cooldown. Please try again in {error.retry_after:.2f} seconds.')
 
 
