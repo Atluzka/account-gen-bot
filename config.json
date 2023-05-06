@@ -4,5 +4,6 @@
   "premium-role-id": "",
   "premium-cooldown": false,
   "premium-cooldown-duration": 3,
-  "cooldown-duration": 10
+  "cooldown-duration": 10,
+  "admin-cooldown": true
 }
