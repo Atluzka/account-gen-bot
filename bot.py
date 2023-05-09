@@ -38,10 +38,10 @@ def getAccs(p):
 def accountDisplay(account_list):
     new_acc_list = []
     for i in account_list:
-            rndmlist1 = i.split(":", 1)
-            rndmlist1[1] = "`" + rndmlist1[1] + "`"
-            new_acc_list.append(rndmlist1[0].upper() + " -> " + rndmlist1[1])
-            return new_acc_list
+        rndmlist1 = i.split(":", 1)
+        rndmlist1[1] = "`" + rndmlist1[1] + "`"
+        new_acc_list.append(rndmlist1[0].upper() + " -> " + rndmlist1[1])
+    return new_acc_list
 
 @bot.event
 async def on_ready():
@@ -134,6 +134,50 @@ async def gencmd_error(interaction: discord.Interaction, error):
     elif isinstance(error, commands.CommandOnCooldown):
         await interaction.response.send_message(f'This command is on cooldown. Please try again in {error.retry_after:.2f} seconds.')
 
+@bot.slash_command(name="create", description="Creates a new service. (ADMIN ONLY)", guild_ids=[config['guild-id']])
+@commands.has_guild_permissions(administrator=True)
+async def create(interaction: discord.Interaction, premium: bool, name: str):
+    if premium:
+        if not os.path.exists(directory + '/paccounts'): 
+            os.mkdir(directory + '/paccounts')
+        open(directory + "/paccounts/" + name.lower() + ".txt", "x")
+        await interaction.response.send_message("Created new service: ``" + name.lower() + "``")
+
+    elif not premium:
+        if not os.path.exists(directory + '/accounts'): 
+            os.mkdir(directory + '/accounts')
+        open(directory + "/accounts/" + name.lower() + ".txt", "x")
+        await interaction.response.send_message("Created new service: ``" + name.lower() + "``")
+    else:
+        await interaction.response.send_message("Error?")
+
+@bot.slash_command(name="add", description="Adds an account to a service. (ADMIN ONLY)", guild_ids=[config['guild-id']])
+@commands.has_guild_permissions(administrator=True)
+async def addacc(interaction: discord.Interaction, premium: bool, service: str, account: str):
+    if premium:
+        for file in glob.glob(directory + '/paccounts/*.txt'):
+            if getFileName(file).lower() == service.lower():
+                with open(file) as fp:
+                    text = fp.read()
+                    fp.close()
+                with open(file, 'a') as fp:
+                    if not text.endswith('\n') and fp.tell() != 0:
+                        fp.write('\n')
+                    fp.write(account)
+                    fp.close()
+                await interaction.response.send_message("Operation successful")
+    elif not premium:
+        for file in glob.glob(directory + '/paccounts/*.txt'):
+                if getFileName(file).lower() == service.lower():
+                    with open(file) as fp:
+                        text = fp.read()
+                    with open(file, 'a') as fp:
+                        if not text.endswith('\n') and fp.tell() != 0:
+                            fp.write('\n')
+                        fp.write(account)
+                    await interaction.response.send_message("Operation successful")
+    else:
+        await interaction.response.send_message("Error?")
 
 @bot.slash_command(name="stock", description="Get the amount of stock.", guild_ids=[config['guild-id']])
 async def stock(ctx):
