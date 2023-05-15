@@ -5,5 +5,7 @@
   "premium-cooldown": false,
   "premium-cooldown-duration": 3,
   "cooldown-duration": 10,
-  "admin-cooldown": true
+  "admin-cooldown": true,
+  "logs-switch": true,
+  "logs-channel-id": ""
 }
