@@ -1,4 +1,4 @@
-import discord, os, glob, json
+import discord, os, glob, json, datetime
 from discord.ext import commands
 
 bot = commands.Bot(intents=discord.Intents.all())
@@ -16,6 +16,26 @@ if not os.path.exists(directory + '/accounts'):
 if not os.path.exists(directory + '/paccounts'): 
     os.mkdir(directory + '/paccounts')
 
+async def sendLog(interaction: discord.Interaction, account, premium):
+    channel = bot.get_channel(int(config["logs-channel-id"]))
+    author_name = interaction.user.name + "#" + interaction.user.discriminator
+    embed=discord.Embed()
+    embed.set_author(name=author_name + ' - ' + str(interaction.user.id),icon_url=interaction.user.avatar.url)
+    embed.description=f"```{account}```"
+    embed.set_footer(text="Generator Log")
+    embed.timestamp = datetime.datetime.now()
+    if premium:
+        embed.color=0xebb733
+    else:
+        embed.color=0x2B2D31
+    await channel.send(embed=embed)
+    return
+
+async def simpleEmbed(interaction, message, ephemeral):
+    embed=discord.Embed()
+    embed.description=f"{message}"
+    embed.color=0x2B2D31
+    await interaction.response.send_message(embed=embed, ephemeral=ephemeral)
 
 def getFileName(file):
     file_name = file.split('\\', -1)[-1]
@@ -79,14 +99,16 @@ async def gen(interaction: discord.Interaction, account: str):
                         color=embed_color)
             genembed.set_footer(text="github.com/Atluzka/account-gen-bot")
             await channel.send(embed=genembed)
-            await interaction.response.send_message("Generated account has been sent to your DMs")
+            await simpleEmbed(interaction, "Generated account has been sent to your DMs", False)
+            if config["logs-switch"]:
+                await sendLog(interaction, acc_line, False)
             return
-    await interaction.response.send_message("Service not found")
+    await simpleEmbed(interaction, "Service doesn't exist or you typed it incorrectly", True)
 
 @gen.error
 async def gencmd_error(interaction: discord.Interaction, error):
     if isinstance(error, commands.CommandOnCooldown):
-        await interaction.response.send_message(f'This command is on cooldown. Please try again in {error.retry_after:.2f} seconds.')
+        await interaction.response.send_message(f'This command is on cooldown. Please try again in {error.retry_after:.2f} seconds.', ephemeral=True)
 
 def premium_cooldown(ctx):
     if not config['admin-cooldown'] and ctx.author.guild_permissions.administrator:
@@ -123,16 +145,18 @@ async def pgen(interaction: discord.Interaction, account: str):
                         color=embed_color)
             genembed.set_footer(text="github.com/Atluzka/account-gen-bot")
             await channel.send(embed=genembed)
-            await interaction.response.send_message("Generated account has been sent to your DMs")
+            await simpleEmbed(interaction, "Generated account has been sent to your DMs", False)
+            if config["logs-switch"]:
+                await sendLog(interaction, acc_line, True)
             return
-    await interaction.response.send_message("Service not found")
+    await simpleEmbed(interaction, "Service doesn't exist or you typed it incorrectly", True)
 
 @pgen.error
 async def gencmd_error(interaction: discord.Interaction, error):
     if isinstance(error, commands.MissingRole):
-        await interaction.response.send_message("You don't have access to this command.")
+        await interaction.response.send_message("You don't have access to this command.", ephemeral=True)
     elif isinstance(error, commands.CommandOnCooldown):
-        await interaction.response.send_message(f'This command is on cooldown. Please try again in {error.retry_after:.2f} seconds.')
+        await interaction.response.send_message(f'This command is on cooldown. Please try again in {error.retry_after:.2f} seconds.', ephemeral=True)
 
 @bot.slash_command(name="create", description="Creates a new service. (ADMIN ONLY)", guild_ids=[config['guild-id']])
 @commands.has_guild_permissions(administrator=True)
@@ -149,7 +173,7 @@ async def create(interaction: discord.Interaction, premium: bool, name: str):
         open(directory + "/accounts/" + name.lower() + ".txt", "x")
         await interaction.response.send_message("Created new service: ``" + name.lower() + "``")
     else:
-        await interaction.response.send_message("Error?")
+        await interaction.response.send_message("Error?", ephemeral=True)
 
 @bot.slash_command(name="add", description="Adds an account to a service. (ADMIN ONLY)", guild_ids=[config['guild-id']])
 @commands.has_guild_permissions(administrator=True)
@@ -165,7 +189,7 @@ async def addacc(interaction: discord.Interaction, premium: bool, service: str, 
                         fp.write('\n')
                     fp.write(account)
                     fp.close()
-                await interaction.response.send_message("Operation successful")
+                await interaction.response.send_message("Operation successful", ephemeral=True)
     elif not premium:
         for file in glob.glob(directory + '/paccounts/*.txt'):
                 if getFileName(file).lower() == service.lower():
@@ -175,9 +199,9 @@ async def addacc(interaction: discord.Interaction, premium: bool, service: str, 
                         if not text.endswith('\n') and fp.tell() != 0:
                             fp.write('\n')
                         fp.write(account)
-                    await interaction.response.send_message("Operation successful")
+                    await interaction.response.send_message("Operation successful", ephemeral=True)
     else:
-        await interaction.response.send_message("Error?")
+        await interaction.response.send_message("Error?", ephemeral=True)
 
 @bot.slash_command(name="stock", description="Get the amount of stock.", guild_ids=[config['guild-id']])
 async def stock(ctx):
