@@ -113,7 +113,7 @@ async def gencmd_error(interaction: discord.Interaction, error):
 def premium_cooldown(ctx):
     if not config['admin-cooldown'] and ctx.author.guild_permissions.administrator:
         return None
-    elif config['premium-cooldown']:
+    elif not config['premium-cooldown']:
         return None
     else:
         return commands.Cooldown(1, config['premium-cooldown-duration'])
