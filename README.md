@@ -26,8 +26,8 @@ It takes the last line from the text file and sends it to the user (of course it
 * `/add {premium: true/false} {name of the service} {account to add}` - Adds an account to service. Admin only command.
 * `/create {premium: true/false} {name of the service}` - Creates a service. Admin only command.
 * Logs - Sends you info such as who and when did somebody generate an account also shows you the account details.
-* Highly customizable. Change premium, free and admin cooldowns. Switch logs on or off. If you want to change embed colors then do so in the bot.py file because json doesnt support hex i can't put them into the config.json file. Might find a way to do it but its not priority.
-* Clean messages.
+* Highly customizable. Change premium, free and admin cooldowns. Choose which channels the generate command can be used in. Switch logs on or off. If you want to change embed colors then do so in the bot.py file because json doesnt support hex i can't put them into the config.json file. Might find a way to do it but its not priority.
+* Clean and customizable messages.
 * Easy to use and lightweight. Works well with large amount of accounts or many people using it at once.
 
 <h3 align="center">
