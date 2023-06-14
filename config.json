@@ -1,11 +1,23 @@
 {
-  "guild-id": "",
-  "token": "",
-  "premium-role-id": "",
+  "guild-id": "12345678901011121314",
+  "token": "YOUR_BOT_TOKEN_HERE",
+  "premium-role-id": "12345678901011121314",
   "premium-cooldown": false,
   "premium-cooldown-duration": 3,
   "cooldown-duration": 10,
   "admin-cooldown": true,
   "logs-switch": true,
-  "logs-channel-id": ""
+  "logs-channel-id": "12345678901011121314",
+  "channel-specific-switch": true,
+  "premium-gen-channels": ["12345678901011121314", "12345678901011121314"],
+  "free-gen-channels": ["12345678901011121314", "12345678901011121314"],
+  "messages": {
+    "not-supported-channel": "This channel is not supported",
+    "account-generated": "Generated account has been sent to your DMs",
+    "service-doesnt-exist": "Service doesn't exist or you typed it incorrectly",
+    "stock-description": "All accounts available to be generated.",
+    "stock-empty-description": "There aren't any accounts to be generated.",
+    "no-permissions": "You don't have access to this command.",
+    "embed-footer": "github.com/Atluzka/account-gen-bot"
+  }
 }
