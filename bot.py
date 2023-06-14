@@ -76,6 +76,9 @@ def normal_cooldown(ctx):
 @bot.slash_command(name="gen", description="Generate an account.", guild_ids=[config['guild-id']])
 @commands.dynamic_cooldown(normal_cooldown, type=commands.BucketType.user)
 async def gen(interaction: discord.Interaction, account: str):
+    if not str(interaction.channel_id) in config["free-gen-channels"] and config["channel-specific-switch"]:
+        await simpleEmbed(interaction, config["messages"]["not-supported-channel"], True)
+        return
     channel = await interaction.user.create_dm()
     for file in glob.glob(directory + '/accounts/*.txt'):
         file_name = file.split('\\', -1)[-1]
@@ -97,13 +100,13 @@ async def gen(interaction: discord.Interaction, account: str):
             genembed=discord.Embed(title="Generated Account - " + file_name,
                         description="```" + acc_line +"```",
                         color=embed_color)
-            genembed.set_footer(text="github.com/Atluzka/account-gen-bot")
+            genembed.set_footer(text=config["messages"]["embed-footer"])
             await channel.send(embed=genembed)
-            await simpleEmbed(interaction, "Generated account has been sent to your DMs", False)
+            await simpleEmbed(interaction, config["messages"]["account-generated"], False)
             if config["logs-switch"]:
                 await sendLog(interaction, acc_line, False)
             return
-    await simpleEmbed(interaction, "Service doesn't exist or you typed it incorrectly", True)
+    await simpleEmbed(interaction, config["messages"]["service-doesnt-exist"], True)
 
 @gen.error
 async def gencmd_error(interaction: discord.Interaction, error):
@@ -122,6 +125,9 @@ def premium_cooldown(ctx):
 @commands.has_role(int(config['premium-role-id']))
 @commands.dynamic_cooldown(premium_cooldown, type=commands.BucketType.user)
 async def pgen(interaction: discord.Interaction, account: str):
+    if not str(interaction.channel_id) in config["premium-gen-channels"] and config["channel-specific-switch"]:
+        await simpleEmbed(interaction, config["messages"]["not-supported-channel"], True)
+        return
     channel = await interaction.user.create_dm()
     for file in glob.glob(directory + '/paccounts/*.txt'):
         file_name = file.split('\\', -1)[-1]
@@ -143,18 +149,18 @@ async def pgen(interaction: discord.Interaction, account: str):
             genembed=discord.Embed(title="Premium Generated Account - " + file_name,
                         description="```" + acc_line +"```",
                         color=embed_color)
-            genembed.set_footer(text="github.com/Atluzka/account-gen-bot")
+            genembed.set_footer(text=config["messages"]["embed-footer"])
             await channel.send(embed=genembed)
-            await simpleEmbed(interaction, "Generated account has been sent to your DMs", False)
+            await simpleEmbed(interaction, config["messages"]["account-generated"], False)
             if config["logs-switch"]:
                 await sendLog(interaction, acc_line, True)
             return
-    await simpleEmbed(interaction, "Service doesn't exist or you typed it incorrectly", True)
+    await simpleEmbed(interaction, config["messages"]["service-doesnt-exist"], True)
 
 @pgen.error
 async def gencmd_error(interaction: discord.Interaction, error):
     if isinstance(error, commands.MissingRole):
-        await interaction.response.send_message("You don't have access to this command.", ephemeral=True)
+        await interaction.response.send_message(config["messages"]["no-permissions"], ephemeral=True)
     elif isinstance(error, commands.CommandOnCooldown):
         await interaction.response.send_message(f'This command is on cooldown. Please try again in {error.retry_after:.2f} seconds.', ephemeral=True)
 
@@ -208,7 +214,7 @@ async def stock(ctx):
     
     service_num = 0
     embed=discord.Embed(title="Stock",
-                        description="All accounts available to be generated.",
+                        description=config["messages"]["stock-description"],
                         color=embed_color)
     
     p = False
@@ -229,11 +235,11 @@ async def stock(ctx):
         embed.add_field(name="Premium Generator", value='\n'.join(new_acc_list), inline=False)
 
     if service_num <= 0:
-        embed.description = "There aren't any accounts to be generated."
+        embed.description = config["messages"]["stock-empty-description"]
 
     embed.title = "Stock - " + str(service_num) +  " Services"
     
-    embed.set_footer(text="github.com/Atluzka/account-gen-bot")
+    embed.set_footer(text=config["messages"]["embed-footer"])
     await ctx.respond(embed=embed)
 
 bot.run(config['token'])
