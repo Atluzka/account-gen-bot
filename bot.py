@@ -1,10 +1,11 @@
 import discord, os, glob, json, datetime
-from discord.ext import commands
+from discord import app_commands
 
-bot = commands.Bot(intents=discord.Intents.all())
-bot.remove_command('help')
+intents = discord.Intents.default()
+bot = discord.Client(intents=intents)
+tree = app_commands.CommandTree(bot)
+
 directory = os.getcwd()
-
 configfile = open(directory + '/config.json')
 config = json.load(configfile)
 
@@ -16,7 +17,7 @@ if not os.path.exists(directory + '/accounts'):
 if not os.path.exists(directory + '/paccounts'): 
     os.mkdir(directory + '/paccounts')
 
-async def sendLog(interaction: discord.Interaction, account, premium):
+async def sendLog(interaction, account, premium):
     channel = bot.get_channel(int(config["logs-channel-id"]))
     author_name = interaction.user.name + "#" + interaction.user.discriminator
     embed=discord.Embed()
@@ -37,25 +38,25 @@ async def simpleEmbed(interaction, message, ephemeral):
     embed.color=0x2B2D31
     await interaction.response.send_message(embed=embed, ephemeral=ephemeral)
 
-def getFileName(file):
+async def getFileName(file):
     file_name = file.split('\\', -1)[-1]
     return file_name.split('.', -1)[0]
 
-def getAccs(p):
+async def getAccs(p):
     allAccounts = []
     if not p:
         for file in glob.glob(directory + '/accounts/*.txt'):
             with open(file, 'r', encoding='utf-8') as fp:
                 x = len(fp.readlines())
-            allAccounts.append(getFileName(file) + ":" + str(x))
+            allAccounts.append(await getFileName(file) + ":" + str(x))
     else:
         for file in glob.glob(directory + '/paccounts/*.txt'):
             with open(file, 'r', encoding='utf-8') as fp:
                 x = len(fp.readlines())
-            allAccounts.append(getFileName(file) + ":" + str(x))
+            allAccounts.append(await getFileName(file) + ":" + str(x))
     return allAccounts
 
-def accountDisplay(account_list):
+async def accountDisplay(account_list):
     new_acc_list = []
     for i in account_list:
         rndmlist1 = i.split(":", 1)
@@ -65,16 +66,23 @@ def accountDisplay(account_list):
 
 @bot.event
 async def on_ready():
+    await tree.sync(guild=discord.Object(id=config["guild-id"]))
     print("Bot: {0.user}".format(bot))
 
-def normal_cooldown(ctx): 
-    if not config['admin-cooldown'] and ctx.author.guild_permissions.administrator:
+@bot.event
+async def on_command_error(interaction: discord.Interaction, error):
+    if isinstance(error, app_commands.CommandNotFound):
+        print("Helo")
+        await simpleEmbed(interaction, "Command not found", True)
+
+def normal_cooldown(interaction: discord.Interaction): 
+    if not config['admin-cooldown'] and interaction.user.guild_permissions.administrator:
         return None
     else:
-        return commands.Cooldown(1, config['cooldown-duration'])
+        return app_commands.Cooldown(1, config['cooldown-duration'])
 
-@bot.slash_command(name="gen", description="Generate an account.", guild_ids=[config['guild-id']])
-@commands.dynamic_cooldown(normal_cooldown, type=commands.BucketType.user)
+@tree.command(name = "gen", description = "Generate an account.", guild=discord.Object(id=config["guild-id"]))
+@app_commands.checks.dynamic_cooldown(normal_cooldown)
 async def gen(interaction: discord.Interaction, account: str):
     if not str(interaction.channel_id) in config["free-gen-channels"] and config["channel-specific-switch"]:
         await simpleEmbed(interaction, config["messages"]["not-supported-channel"], True)
@@ -110,20 +118,20 @@ async def gen(interaction: discord.Interaction, account: str):
 
 @gen.error
 async def gencmd_error(interaction: discord.Interaction, error):
-    if isinstance(error, commands.CommandOnCooldown):
+    if isinstance(error, app_commands.CommandOnCooldown):
         await interaction.response.send_message(f'This command is on cooldown. Please try again in {error.retry_after:.2f} seconds.', ephemeral=True)
 
-def premium_cooldown(ctx):
-    if not config['admin-cooldown'] and ctx.author.guild_permissions.administrator:
+def premium_cooldown(interaction: discord.Interaction):
+    if not config['admin-cooldown'] and interaction.user.guild_permissions.administrator:
         return None
     elif not config['premium-cooldown']:
         return None
     else:
-        return commands.Cooldown(1, config['premium-cooldown-duration'])
+        return app_commands.Cooldown(1, config['premium-cooldown-duration'])
 
-@bot.slash_command(name="pgen", description="Generate an premium account.", guild_ids=[config['guild-id']])
-@commands.has_role(int(config['premium-role-id']))
-@commands.dynamic_cooldown(premium_cooldown, type=commands.BucketType.user)
+@tree.command(name = "pgen", description = "Generate an premium account.", guild=discord.Object(id=config["guild-id"]))
+@app_commands.checks.has_role(int(config['premium-role-id']))
+@app_commands.checks.dynamic_cooldown(premium_cooldown)
 async def pgen(interaction: discord.Interaction, account: str):
     if not str(interaction.channel_id) in config["premium-gen-channels"] and config["channel-specific-switch"]:
         await simpleEmbed(interaction, config["messages"]["not-supported-channel"], True)
@@ -159,13 +167,13 @@ async def pgen(interaction: discord.Interaction, account: str):
 
 @pgen.error
 async def gencmd_error(interaction: discord.Interaction, error):
-    if isinstance(error, commands.MissingRole):
+    if isinstance(error, app_commands.MissingRole):
         await interaction.response.send_message(config["messages"]["no-permissions"], ephemeral=True)
-    elif isinstance(error, commands.CommandOnCooldown):
+    elif isinstance(error, app_commands.CommandOnCooldown):
         await interaction.response.send_message(f'This command is on cooldown. Please try again in {error.retry_after:.2f} seconds.', ephemeral=True)
 
-@bot.slash_command(name="create", description="Creates a new service. (ADMIN ONLY)", guild_ids=[config['guild-id']])
-@commands.has_guild_permissions(administrator=True)
+@tree.command(name = "create", description = "Creates a new service. (ADMIN ONLY)", guild=discord.Object(id=config["guild-id"]))
+@app_commands.checks.has_permissions(administrator=True)
 async def create(interaction: discord.Interaction, premium: bool, name: str):
     if premium:
         if not os.path.exists(directory + '/paccounts'): 
@@ -181,8 +189,8 @@ async def create(interaction: discord.Interaction, premium: bool, name: str):
     else:
         await interaction.response.send_message("Error?", ephemeral=True)
 
-@bot.slash_command(name="add", description="Adds an account to a service. (ADMIN ONLY)", guild_ids=[config['guild-id']])
-@commands.has_guild_permissions(administrator=True)
+@tree.command(name = "add", description = "Adds an account to a service. (ADMIN ONLY)", guild=discord.Object(id=config["guild-id"]))
+@app_commands.checks.has_permissions(administrator=True)
 async def addacc(interaction: discord.Interaction, premium: bool, service: str, account: str):
     if premium:
         for file in glob.glob(directory + '/paccounts/*.txt'):
@@ -209,8 +217,8 @@ async def addacc(interaction: discord.Interaction, premium: bool, service: str, 
     else:
         await interaction.response.send_message("Error?", ephemeral=True)
 
-@bot.slash_command(name="stock", description="Get the amount of stock.", guild_ids=[config['guild-id']])
-async def stock(ctx):
+@tree.command(name = "stock", description = "Get the amount of stock.", guild=discord.Object(id=config["guild-id"]))
+async def stock(interaction: discord.Interaction):
     
     service_num = 0
     embed=discord.Embed(title="Stock",
@@ -218,19 +226,19 @@ async def stock(ctx):
                         color=embed_color)
     
     p = False
-    account_list = getAccs(p)
+    account_list = await getAccs(p)
     new_acc_list = []
 
     if not len(account_list) <= 0:
-        new_acc_list = accountDisplay(account_list)
+        new_acc_list = await accountDisplay(account_list)
         embed.add_field(name="Free Generator", value='\n'.join(new_acc_list), inline=False)
         service_num = len(new_acc_list)
         del new_acc_list, account_list
 
     new_acc_list = []
-    account_list = getAccs(p = True)
+    account_list = await getAccs(p = True)
     if not len(account_list) <= 0:
-        new_acc_list = accountDisplay(account_list)
+        new_acc_list = await accountDisplay(account_list)
         service_num = len(new_acc_list) + service_num
         embed.add_field(name="Premium Generator", value='\n'.join(new_acc_list), inline=False)
 
@@ -240,6 +248,6 @@ async def stock(ctx):
     embed.title = "Stock - " + str(service_num) +  " Services"
     
     embed.set_footer(text=config["messages"]["embed-footer"])
-    await ctx.respond(embed=embed)
+    await interaction.response.send_message(embed=embed)
 
 bot.run(config['token'])
