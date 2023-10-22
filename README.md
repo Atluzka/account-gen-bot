@@ -1,40 +1,50 @@
 <h1 align="center">
-	  DISCORD ACCOUNT GENERATOR BOT
+	  DISCORD GENERATOR BOT
 </h1>
-
-<p align="center">
-	  Disclaimer: This bot doesn't generate accounts out of thin air, you need stock.
-</p>
 
 <h3 align="center">
 	  INFO
 </h3>
 
-Using commands such as `/gen` (`/pgen` for premium users), people can generate accounts, codes or other similar things. 
+It uses a database to store the accounts, which people can generate. The bot has many customization options which can be changed in config.json (will make it even more customizable in next upd). It supports cookies or user/mail : pass.
 
-You put bunch of accounts in mail:pass or user:pass format in a text file and if a user uses one of the commands mentioned before they can generate the accounts. They can also be codes like giftcards.
-
-It takes the last line from the text file and sends it to the user (of course it deletes the line as well, so there won't be any duplicates)
+I haven't made logs yet but i will add it when i feel like updating it.
 
 <h3 align="center">
 	  FEATURES
+
 </h3>
 
-* `/stock` - Get all of the available services and how many accounts there are.
-* `/gen {name of the service}` - Generates an account and sends it to the user's DMs.
-* `/pgen {name of the service}` - Same as /gen but for premium users.
-* `/add {premium: true/false} {name of the service} {account to add}` - Adds an account to service. Admin only command.
-* `/create {premium: true/false} {name of the service}` - Creates a service. Admin only command.
-* Logs - Sends you info such as who and when did somebody generate an account also shows you the account details.
-* Highly customizable. Change premium, free and admin cooldowns. Choose which channels the generate command can be used in. Switch logs on or off. If you want to change embed colors then do so in the bot.py file because json doesnt support hex i can't put them into the config.json file. Might find a way to do it but its not priority.
-* Clean and customizable messages.
-* Easy to use and lightweight. Works well with large amount of accounts or many people using it at once.
+* `/stock` - Shows stock. [Example message](https://github.com/Atluzka/account-gen-bot/assets/52002842/1b33211d-92a7-4b12-bed0-e0d49a38cdbd)
+* `/generate [service]` - Will get an account/cookie from the database and send it to the user. [server message](https://github.com/Atluzka/account-gen-bot/assets/52002842/87d7ddb4-efbe-4b96-8e29-bc42e57e1d5e), [DMs message](https://github.com/Atluzka/account-gen-bot/assets/52002842/bfc7d186-5e71-42bd-a002-756640485abb)
+* `/addstock [service] [upload file]` - Will add stock to database. Also checks for dupes. [Before running](https://github.com/Atluzka/account-gen-bot/assets/52002842/d9dea2fd-2e25-4bde-bace-e538da0118b0), [After running](https://github.com/Atluzka/account-gen-bot/assets/52002842/91764c4c-2ae5-4fab-9aff-6f3e37044e0b)
+* `/createservice [name] [type]` - Creates a service in the database. [example](https://github.com/Atluzka/account-gen-bot/assets/52002842/77bfa2a1-23d3-401a-9a17-bda33724751d)
+* `/deleteservice [service]` - Will ask for confirmation. [confirmation example](https://github.com/Atluzka/account-gen-bot/assets/52002842/771fb803-2388-487f-a8a8-6ea8c4a7312e)
+* Highly customizable.
+* Easy to use and lightweight.
 
 <h3 align="center">
-	  SCREENSHOTS
+	  ERRORS
+
 </h3>
-<div align="center"> 
-    <img style="border-radius: 15px; display: block; margin-left: auto; margin-right: auto; margin-bottom:20px;" width="50%" src="https://github.com/Atluzka/account-gen-bot/assets/52002842/11d18764-3559-4c5b-ae20-a2d31cd3f636"></img>
-    <img style="border-radius: 15px; display: block; margin-left: auto; margin-right: auto; margin-bottom:20px;" width="50%" src="https://github.com/Atluzka/account-gen-bot/assets/52002842/0004c18d-d914-4f08-8927-afd632972f64"></img>
-    <img style="border-radius: 15px; display: block; margin-left: auto; margin-right: auto; margin-bottom:20px;" width="50%" src="https://github.com/Atluzka/account-gen-bot/assets/52002842/7a3c31c7-8567-4c2f-bd45-46969a805b12"></img>
-</div>
+
+Make sure you have everything installed. Put this inside a `requirements.txt` file
+```
+discord.py==2.3.2
+Requests==2.31.0
+typing==3.7.4.3
+datetime==5.2
+```
+Open a console in the folder u made the file in and run this:
+```
+pip install -r requirements.txt
+```
+
+If you get an error related to Privileges/intents go to [discord.dev](https://discord.dev) and enable all the intents for your application. 
+(discord.dev -> applications -> choose your application -> bot -> scroll down a bit -> there should be 'Privileged Gateway Intents' -> enable all)
+
+The bot is not sending any messages? Make sure your intents are enabled and the bot has permission to send messages in the channel you're using the bot in. (You also have to specify the channels where the generate command can be used in.)
+
+You dont get a dm from the bot? Make sure your dms are open.
+
+If have any other errors make a issue about it or you can also message me in discord (you can find my discord on my profile.)
