@@ -1,0 +1,50 @@
+{
+    "token": "YOUR_BOT_TOKEN",
+    "guild-id": "YOUR_GUILD_ID",
+    
+    "gen-channels": [
+        1115386974413525055,
+    ],
+    
+    "roles": {
+        "free-role": "269539324931742842",
+        "premium-role": "269539324931742842",
+        "booster-role": "269539324931742842"
+    },
+
+    "cooldowns": {
+        "_comment": "these values are in minutes",
+        "normal": 5,
+        "booster": 3,
+        "premium": 1
+    },
+
+    "admins": [
+        123456789012345678
+    ],
+
+    "messages": {
+        "noperms": ":neutral_face: ",
+        "wrongchannel": ":thinking: ",
+
+        "cookie-altmessage-switch": false,
+        "altsent": "Thank you for using AtluzkaGEN"
+    },
+
+    "generate-settings": {
+        "color": 1288807,
+        "gif-img-url": "https://media.discordapp.net/attachments/807809192537882647/1119647605140488242/C02ECC68-ACE2-4293-8992-BE67B45E6378.gif"
+    },
+
+    "colors": {
+        "error": 16713025,
+        "success": 1288807,
+        "stock": 7229605
+    },
+
+    "_comment2": "Size for uploading stock. Default: 2097152 == 2mb",
+    "maximum-file-size": 2097152,
+
+    "cookie-seperator": "---------------------------",
+    "logs-webhook": null
+}
