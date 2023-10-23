@@ -47,4 +47,4 @@ The bot is not sending any messages? Make sure your intents are enabled and the 
 
 You dont get a dm from the bot? Make sure your dms are open.
 
-If have any other errors make a issue about it or you can also message me in discord (you can find my discord on my profile.)
+If you have any other errors make a issue about it or you can also message me in discord (you can find my discord on my profile.)
