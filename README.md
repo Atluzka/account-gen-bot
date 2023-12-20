@@ -40,6 +40,12 @@ Open a console in the folder u made the file in and run this:
 pip install -r requirements.txt
 ```
 
+Exmaple of a txt file (for addstock command)
+```
+username:password
+email:password
+```
+
 If you get an error related to Privileges/intents go to [discord.dev](https://discord.dev) and enable all the intents for your application. 
 (discord.dev -> applications -> choose your application -> bot -> scroll down a bit -> there should be 'Privileged Gateway Intents' -> enable all)
 
