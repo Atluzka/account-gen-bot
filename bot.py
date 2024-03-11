@@ -52,7 +52,7 @@ async def getServices():
 
 @bot.event
 async def on_ready():
-    #await tree.sync(guild=discord.Object(id=config["guild-id"]))
+    await tree.sync(guild=discord.Object(id=config["guild-id"]))
     await getServices()
     print('Services:', Abkradam)
     print("Logged in as {0.user}".format(bot))
