@@ -1,13 +1,12 @@
-import discord, json, os, sqlite3, requests, string, random
+import discord, json, sqlite3
 from discord import app_commands
 from discord.ui import Button, View
-from datetime import datetime, timedelta
+from datetime import timedelta
 from io import StringIO
-from discord.ext import commands
 from typing import List
 
 # connect to the database
-con = sqlite3.connect('accounts.db')
+con = sqlite3.connect('bin/accounts.db')
 con.row_factory = sqlite3.Row
 
 bot = discord.Client(intents=discord.Intents.default())
@@ -53,7 +52,7 @@ async def getServices():
 
 @bot.event
 async def on_ready():
-    await tree.sync(guild=discord.Object(id=config["guild-id"]))
+    #await tree.sync(guild=discord.Object(id=config["guild-id"]))
     await getServices()
     print('Services:', Abkradam)
     print("Logged in as {0.user}".format(bot))
@@ -153,6 +152,17 @@ async def getPremiumStock():
     cursor.close()
     return stock
     
+async def memberHasAccess(interaction: discord.Interaction, service_name):
+    if interaction.user.id in config['admins']:
+        return True
+    userRoles = [role.id for role in interaction.user.roles]
+    hasAccess = False
+    for _, Ok__ja12__Mn__a2H__ji5__9K in config["roles"].items(): # Loop over all of the roles.
+        # Check if the user has that role and if the role has access to that specific service.
+        if int(Ok__ja12__Mn__a2H__ji5__9K["id"]) in userRoles and (service_name in Ok__ja12__Mn__a2H__ji5__9K["gen-access"] or 'all' in Ok__ja12__Mn__a2H__ji5__9K["gen-access"]):
+            hasAccess = True
+            break
+    return hasAccess
 
 async def getAccount(service):
     cursor = con.cursor()
@@ -173,6 +183,20 @@ async def getAccount(service):
         cursor.close()
         return False,None,False
 
+async def checkPremium(interaction: discord.Interaction):
+    if interaction.user.id in config['admins']:
+        return True
+    userRoles = [role.id for role in interaction.user.roles]
+    isPremium = False
+    for Ok__jaU2__Mn__abH__jK5__9K, Ok__ja12__Mn__a2H__ji5__9K in config["roles"].items(): # Loop over all of the roles.
+
+        if Ok__jaU2__Mn__abH__jK5__9K == "default":
+            continue # Checks if the name is default, doesnt count it.
+
+        if int(Ok__ja12__Mn__a2H__ji5__9K["id"]) in userRoles and Ok__ja12__Mn__a2H__ji5__9K["premium"]:
+            isPremium = True
+    return isPremium
+
 async def service_autcom(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
     types = Abkradam
     return [
@@ -180,17 +204,27 @@ async def service_autcom(interaction: discord.Interaction, current: str) -> List
         for service in types if current.lower() in service.lower()
     ]
 
-def cooldown(interaction: discord.Interaction):
-    isPremium = interaction.user.get_role(int(config['roles']["premium-role"]))
-    isBooster = interaction.user.get_role(int(config['roles']["booster-role"]))
-    if interaction.user.id in config['admins']:
+async def cooldown(interaction: discord.Interaction):
+    if interaction.user.id in config['admins']: # If the user is admin then dont give them a cooldown.
         return None
-    elif isPremium:
-        return app_commands.Cooldown(1, str(timedelta(minutes=config['cooldowns']['premium']).total_seconds()))
-    elif isBooster:
-        return app_commands.Cooldown(1, str(timedelta(minutes=config['cooldowns']['booster']).total_seconds()))
-    else:
-        return app_commands.Cooldown(1, str(timedelta(minutes=config['cooldowns']['normal']).total_seconds()))
+    
+    userRoles = [role.id for role in interaction.user.roles]    # List of all the ids of roles the user has.
+    minCooldown = float("inf")                                  # Minimum cooldown the user can get.
+    
+    for Ok__jaU2__Mn__abH__jK5__9K, Ok__ja12__Mn__a2H__ji5__9K in config["roles"].items(): # Loop over all of the roles.
+
+        if Ok__jaU2__Mn__abH__jK5__9K == "default":
+            continue # Checks if the name is default, doesnt count it.
+
+        # Check if the user has that role and check if the roles cooldown is lower than the current minimum cooldown.
+        if int(Ok__ja12__Mn__a2H__ji5__9K["id"]) in userRoles and float(Ok__ja12__Mn__a2H__ji5__9K["cooldown"]) < minCooldown:
+            minCooldown = float(Ok__ja12__Mn__a2H__ji5__9K["cooldown"])
+
+    if not minCooldown == float("inf"):
+        return app_commands.Cooldown(1, str(timedelta(minutes=minCooldown).total_seconds()))
+    
+    else: # If the user didnt have any of the roles, give them the default cooldown.
+        return app_commands.Cooldown(1, str(timedelta(minutes=config['roles']['default']["cooldown"]).total_seconds()))
 
 @tree.command(name = "generate", description = "Generate an account of your choice.", guild=discord.Object(id=config["guild-id"]))
 @app_commands.autocomplete(service=service_autcom)
@@ -198,7 +232,8 @@ def cooldown(interaction: discord.Interaction):
 async def generate(interaction: discord.Interaction, service: str):
     try:
         
-        if not interaction.user.id in config['admins'] and not interaction.user.get_role(int(config['roles']["free-role"])):
+        # Checks if the person has admin and is doesn't have the default role.
+        if not interaction.user.id in config['admins'] and not interaction.user.get_role(int(config['roles']["default"]["id"])):
             return await interaction.response.send_message(str(config['messages']['noperms']), ephemeral=True)
         
         if not interaction.user.id in config['admins'] and not interaction.channel_id in config["gen-channels"]:
@@ -209,7 +244,11 @@ async def generate(interaction: discord.Interaction, service: str):
             types = [typez for typez in Abkradam]
             return await interaction.response.send_message(f'Invalid service. Service list: `{types}`', ephemeral=True)
         
-        if not interaction.user.id in config['admins'] and not interaction.user.get_role(int(config['roles']["premium-role"])):
+        if not interaction.user.id in config['admins'] and not await memberHasAccess(interaction, service):
+            return await interaction.response.send_message(f"You do not have access to this service.", ephemeral=True)
+
+        kJnab87U_9kamn2jJ_Kam21n87 = await checkPremium(interaction)
+        if not interaction.user.id in config['admins'] and not kJnab87U_9kamn2jJ_Kam21n87:
             name, iscookie, ispremium = await getName(service)
             if ispremium:
                 return await interaction.response.send_message(f'You need to have the premium role to use this command.', ephemeral=True) 
@@ -219,7 +258,6 @@ async def generate(interaction: discord.Interaction, service: str):
         
         # respond
         if not success:
-            app_commands.Cooldown(1, str(timedelta(minutes=config['cooldowns']['error']).total_seconds()))
             return await interaction.response.send_message(f"There is no stock left.", ephemeral=True)
         
         if iscookie:
@@ -228,7 +266,7 @@ async def generate(interaction: discord.Interaction, service: str):
             if config['messages']['cookie-altmessage-switch']:
                 await channel.send(embed=embd)
             embd2=discord.Embed(title=f"`{service}` generated :label: ",description=':incoming_envelope: Check your DMs for the cookie.',color=config['colors']['success'])
-            embd2.set_footer(text='github.com/Atluzka/account-gen-bot',icon_url=interaction.user.avatar.url)
+            embd2.set_footer(text='github.com/Atluzka/account-gen-bot',icon_url=interaction.user.display_avatar.url)
             embd2.set_image(url=config["generate-settings"]["gif-img-url"])
             await channel.send(file=discord.File(fp=StringIO(account['cookie']), filename=f'{service}.txt'))
             return await interaction.response.send_message(embed=embd2, ephemeral=False)
@@ -236,9 +274,9 @@ async def generate(interaction: discord.Interaction, service: str):
         else:
             channel = await interaction.user.create_dm()
             embd=discord.Embed(title="Account Generated :label: ",description=config['messages']['altsent'] + f"\n```{account['username']}:{account['password']}```",color=config['colors']['success']) 
-            embd.set_footer(text='github.com/Atluzka/account-gen-bot',icon_url=interaction.user.avatar.url)
+            embd.set_footer(text='github.com/Atluzka/account-gen-bot',icon_url=interaction.user.display_avatar.url)
             embd2=discord.Embed(title=f"`{service}` generated :label: ",description=':incoming_envelope: Check your DMs for the account.',color=config['colors']['success'])
-            embd2.set_footer(text='github.com/Atluzka/account-gen-bot',icon_url=interaction.user.avatar.url)
+            embd.set_footer(text='github.com/Atluzka/account-gen-bot',icon_url=interaction.user.display_avatar.url)
             embd2.set_image(url=config["generate-settings"]["gif-img-url"])
             await channel.send(embed=embd)
             return await interaction.response.send_message(embed=embd2, ephemeral=False)

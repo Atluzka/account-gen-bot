@@ -1,27 +1,35 @@
 {
-    "token": "YOUR_BOT_TOKEN",
-    "guild-id": "YOUR_GUILD_ID",
+    "token": "BOT-TOKEN-HERE",
+    "guild-id": "SERVER-ID-HERE",
     
     "gen-channels": [
-        1115386974413525055
+        12345678
     ],
-    
-    "roles": {
-        "free-role": "269539324931742842",
-        "premium-role": "269539324931742842",
-        "booster-role": "269539324931742842"
-    },
-
-    "cooldowns": {
-        "_comment": "these values are in minutes",
-        "normal": 5,
-        "booster": 3,
-        "premium": 1
-    },
 
     "admins": [
-        123456789012345678
+        12345678
     ],
+
+    "roles": {
+        "default": {
+            "id": "0",
+            "cooldown": 60,
+            "premium": false,
+            "gen-access": ["valorant"]
+        },
+        "custom-1": {
+            "id": "0",
+            "cooldown": 30,
+            "premium": false,
+            "gen-access": ["netflix", "spotify"]
+        },
+        "custom-2": {
+            "id": "0",
+            "cooldown": 30,
+            "premium": true,
+            "gen-access": ["all"]
+        }
+    },
 
     "messages": {
         "noperms": ":neutral_face: ",
