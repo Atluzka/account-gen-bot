@@ -316,7 +316,7 @@ async def addaccounts(interaction: discord.Interaction, service: str, file: disc
     if iscookie:
         current_cookie = ""
         dec_cont = content.decode('utf-8')
-        content = str(dec_cont).split("\r\n")
+        content = str(dec_cont).split("\n")
         append_lines = False
         for line in content:
             if config['cookie-seperator'] in line:
@@ -328,7 +328,7 @@ async def addaccounts(interaction: discord.Interaction, service: str, file: disc
                 current_cookie += line + '\n'
     else:
         dec_cont = content.decode('utf-8')
-        content = str(dec_cont).split("\r\n")
+        content = str(dec_cont).split("\n")
         for item in content:
             if len(item) > 2:
                 filtered_stock.append(item)
