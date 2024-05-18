@@ -31,7 +31,6 @@ I haven't made logs yet but i will add it when i feel like updating it.
 Make sure you have everything installed. Put this inside a `requirements.txt` file
 ```
 discord.py==2.3.2
-Requests==2.31.0
 typing==3.7.4.3
 datetime==5.2
 ```
