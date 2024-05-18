@@ -8,6 +8,8 @@
 
 It uses a database to store the accounts, which people can generate. The bot has many customization options which can be changed in config.json (will make it even more customizable in next upd). It supports cookies or user/mail : pass.
 
+This bot DOES NOT make accounts for you, you need to have the accounts yourself and u can put them inside the database which other people can generate.
+
 I haven't made logs yet but i will add it when i feel like updating it.
 
 <h3 align="center">
