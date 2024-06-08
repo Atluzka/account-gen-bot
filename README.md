@@ -1,57 +1,63 @@
-<h1 align="center">
-	  DISCORD GENERATOR BOT
-</h1>
+# Account Generator Bot
+A discord bot which manages a database of accounts and provides a user-friendly way to retrive them. Users can generate them thru an command and receive the account in their DMs. The bot ensures that each account is only distributed once, keeping the process organized and efficient.
 
-<h3 align="center">
-	  INFO
-</h3>
+# Commands
+* `/stock` - Retrives the amount of stock left from the database.
+* `/gen [service]` - Generates an account and sends it to the users DMs.
+* `/addstock [service] [upload txt file]` - Adds stock to the desired service. Checks for dupes.
+* `/createservice [service]` - Creates a service in the database.
+* `/deleteservice [service]` - Deletes a service from the database.
 
-It uses a database to store the accounts, which people can generate. The bot has many customization options which can be changed in config.json (will make it even more customizable in next upd). It supports cookies or user/mail : pass.
+# Config
 
-This bot DOES NOT make accounts for you, you need to have the accounts yourself and u can put them inside the database which other people can generate.
+Explanation to some things in the config.
+Do not paste this inside your config, it will not work.
+```json
+{
+    "token": "Here put your 'BOT TOKEN', NOT your 'ACCOUNT TOKEN'",
+    "guild-id": "This is self-explanatory, here goes the ID of your server/guild", 
+    "stock-command-silent": "boolean, makes the stock command only visible to the user who used the command."
+    "remove-capture-from-stock": "boolean, will remove '| your capture here' if you have it in the stock"
+    "gen-channels": "A list of all the channels where the /generate command can be used in."
+    "admins": "A list of admins, you must add yourself as an admin (your discord user id) in order to use admin only commands."
+    "roles": [
+        {
+            "id": "Id of the role",
+            "cooldown": "Here put the cooldown in seconds, this is a integer.",
+            "gen-access": [
+		"Here put",
+		"The names of all the serveices u want the user with this",
+		"role to have access to."
+		"You can also use 'all' if you want to give access to all the services"
+	    ]
+        }
+    ],
 
-I haven't made logs yet but i will add it when i feel like updating it.
-
-<h3 align="center">
-	  FEATURES
-
-</h3>
-
-* `/stock` - Shows stock. [Example message](https://github.com/Atluzka/account-gen-bot/assets/52002842/1b33211d-92a7-4b12-bed0-e0d49a38cdbd)
-* `/generate [service]` - Will get an account/cookie from the database and send it to the user. [server message](https://github.com/Atluzka/account-gen-bot/assets/52002842/87d7ddb4-efbe-4b96-8e29-bc42e57e1d5e), [DMs message](https://github.com/Atluzka/account-gen-bot/assets/52002842/bfc7d186-5e71-42bd-a002-756640485abb)
-* `/addstock [service] [upload file]` - Will add stock to database. Also checks for dupes. [Before running](https://github.com/Atluzka/account-gen-bot/assets/52002842/d9dea2fd-2e25-4bde-bace-e538da0118b0), [After running](https://github.com/Atluzka/account-gen-bot/assets/52002842/91764c4c-2ae5-4fab-9aff-6f3e37044e0b)
-* `/createservice [name] [type]` - Creates a service in the database. [example](https://github.com/Atluzka/account-gen-bot/assets/52002842/77bfa2a1-23d3-401a-9a17-bda33724751d)
-* `/deleteservice [service]` - Will ask for confirmation. [confirmation example](https://github.com/Atluzka/account-gen-bot/assets/52002842/771fb803-2388-487f-a8a8-6ea8c4a7312e)
-* Highly customizable.
-* Easy to use and lightweight.
-
-<h3 align="center">
-	  ERRORS
-
-</h3>
-
-Make sure you have everything installed. Put this inside a `requirements.txt` file
-```
-discord.py==2.3.2
-typing==3.7.4.3
-datetime==5.2
-```
-Open a console in the folder u made the file in and run this:
-```
-pip install -r requirements.txt
+    "messages": "Self-explanatory, here is the list of the messages which can be easily changed."
+    "generate-settings": { "gif-img-url": "HERE GOES THE DIRECT URL OF A PICTURE/GIF THAT WILL BE SENT EVERYTIME SOMEONE GENERATES SOMETHING" },
+    "maximum-file-size": "The maximum file size in bytes, default is 2mb"
+}
 ```
 
-Exmaple of a txt file (for addstock command)
+# Errors
+
+If you get any errors that are not listed here feel free to contact me in discord, you can get my discord from my github profile.
+
+### 1. Privileges/intents
+Go to https://discord.dev and enable all the intents for your application. (discord.dev -> applications -> choose your application -> bot -> scroll down a bit -> there should be 'Privileged Gateway Intents' -> enable all)
+
+### 2. Not sending messages
+Make sure your intents are enabled and the bot has permission to send messages in the channel you're using the bot in. (You also have to specify the channels where the generate command can be used in thru the config). If the bot doesn't send a DM then make sure your dms are open.
+
+### 3. ModuleNotFound
+Install the requirered modules: **discord.py**, **typing**, **datetime**. If it doesn't work after that, reinstall python completely. I recommend downloading the 3.11.6 version from https://python.org. While installing make sure "ADD TO PATH" is enabled.
+
+### 4. Addstock doesn't work
+It takes each line as an account from the txt file, so each account has to be on a seperate line.
+
+Example of an txt file (it can be any of those):
 ```
-username:password
-email:password
+account@gmail.com:test
+tester:hello|capture
+or just a piece of text
 ```
-
-If you get an error related to Privileges/intents go to [discord.dev](https://discord.dev) and enable all the intents for your application. 
-(discord.dev -> applications -> choose your application -> bot -> scroll down a bit -> there should be 'Privileged Gateway Intents' -> enable all)
-
-The bot is not sending any messages? Make sure your intents are enabled and the bot has permission to send messages in the channel you're using the bot in. (You also have to specify the channels where the generate command can be used in.)
-
-You dont get a dm from the bot? Make sure your dms are open.
-
-If you have any other errors make a issue about it or you can also message me in discord (you can find my discord on my profile.)
