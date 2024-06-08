@@ -1,0 +1,42 @@
+{
+    "token": "DISCORD-BOT-TOKEN",
+    "guild-id": "DISCORD-SERVER-ID",
+
+    "stock-command-silent": false,
+    "remove-capture-from-stock": true,
+
+    "gen-channels": [12345],
+    "admins": [0],
+    "roles": [
+        {
+            "id": 0,
+            "cooldown": 60,
+            "gen-access": ["netflix"]
+        },
+        {
+            "id": 0,
+            "cooldown": 30,
+            "gen-access": ["all"]
+        }
+    ],
+
+    "messages": {
+        "noperms": "You do not have permissions to use this command.",
+        "wrongchannel": ":thinking: ",
+        "altsent": "Thank you for using AtluzkaGEN",
+        "footer-msg": "github.com/Atluzka/account-gen-bot"
+    },
+
+    "generate-settings": {
+        "gif-img-url": "https://media.discordapp.net/attachments/807809192537882647/1119647605140488242/C02ECC68-ACE2-4293-8992-BE67B45E6378.gif"
+    },
+
+    "colors": {
+        "error": 16713025,
+        "success": 1288807,
+        "stock": 7229605
+    },
+
+    "_comment1": "Size for uploading stock. Default: 2097152 == 2mb",
+    "maximum-file-size": 2097152
+}
