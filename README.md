@@ -26,7 +26,7 @@ Do not paste this inside your config, it will not work.
             "cooldown": "Here put the cooldown in seconds, this is a integer.",
             "gen-access": [
 		"Here put",
-		"The names of all the serveices u want the user with this",
+		"The names of all the services u want the user with this",
 		"role to have access to."
 		"You can also use 'all' if you want to give access to all the services"
 	    ]
