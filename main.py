@@ -1,10 +1,11 @@
 import discord, json, sqlite3
+from datetime import datetime, timedelta
 from discord import app_commands
-from datetime import timedelta
 from typing import List
 
 from src import database
 from src import utils
+from src import cooldown_manager
 
 # connect to the database
 con = sqlite3.connect('accounts.db'); con.row_factory = sqlite3.Row
@@ -22,7 +23,7 @@ async def updateServices():
     serviceList = await database.getServices(con)
     return
 
-user_cooldown = []
+user_cooldowns = []
 
 @bot.event
 async def on_ready():
@@ -65,33 +66,10 @@ async def deleteservice(interaction: discord.Interaction, service: str):
     
     return await interaction.response.send_message(embed=embd, ephemeral=True)
 
-async def gen_cooldown(interaction: discord.Interaction):
-    if interaction.user.id in config['admins']:
-        return None
-    
-    userRoles = [role.id for role in interaction.user.roles]
-    minCooldown = float("inf")
-    
-    for role in config["roles"]:
-        if int(role["id"]) in userRoles and float(role["cooldown"]) < minCooldown:
-            minCooldown = float(role["cooldown"])
-
-    if not minCooldown == float("inf"):
-        if interaction.user.id in user_cooldown:
-            return app_commands.Cooldown(1, str(timedelta(seconds=minCooldown).total_seconds()))
-        else:
-            return None
-    else:
-        if interaction.user.id in user_cooldown:
-            return app_commands.Cooldown(1, str(timedelta(seconds=config['roles'][0]["cooldown"]).total_seconds()))
-        else:
-            return None
-
 @tree.command(name = "gen", description = "Generate an account of your choice", guild=discord.Object(id=config["guild-id"]))
 @app_commands.autocomplete(service=service_autcom)
-@app_commands.checks.dynamic_cooldown(gen_cooldown)
 async def gen(interaction: discord.Interaction, service: str):
-    global user_cooldown
+    global user_cooldowns
     
     if not is_everything_ready:
         return await interaction.response.send_message("Bot is starting.", ephemeral=True)
@@ -108,16 +86,27 @@ async def gen(interaction: discord.Interaction, service: str):
         return await interaction.response.send_message(str(config['messages']['noperms']), ephemeral=True)
 
     # Cooldown
-    if interaction.user.id in user_cooldown:
-        user_cooldown.remove(interaction.user.id)
-        embd=discord.Embed(title="Cooldown",description=f':no_entry_sign: This command is on cooldown.',color=config['colors']['error'])
-        return await interaction.response.send_message(embed=embd, ephemeral=False)
-    if interaction.user.id not in config['admins']:
-        user_cooldown.append(interaction.user.id)
+    _user_cldw = None
+    has_cldw = await cooldown_manager.does_user_have_cooldown(user_cooldowns, interaction.user.id)
+    if interaction.user.id not in config['admins'] and not has_cldw:
+        _user_cldw = await cooldown_manager.get_role_user_cooldown(interaction)
+        if _user_cldw is not None:
+            user_cooldowns.append(f"{interaction.user.id}:{int(_user_cldw)}")
+    elif has_cldw:
+        _data = await cooldown_manager.getCooldownData(user_cooldowns, interaction.user.id)
+        if _data['stillHasCooldown']:
+            embd=discord.Embed(title="Cooldown",description=f':no_entry_sign: {_data["formatedCooldownMsg"]}',color=config['colors']['error'])
+            return await interaction.response.send_message(embed=embd, ephemeral=False)
+        elif _data['secondsTillEnd'] == 0:
+            user_cooldowns.remove(f"{interaction.user.id}:{int(_data['endTime'])}")
+            _user_cldw = await cooldown_manager.get_role_user_cooldown(interaction)
+            if _user_cldw is not None:
+                user_cooldowns.append(f"{interaction.user.id}:{int(_user_cldw)}")
 
     success, account = await database.getAccount(con, service)
     if not success:
-        user_cooldown.remove(interaction.user.id)
+        if _user_cldw:
+            user_cooldowns.remove(f"{interaction.user.id}:{int(_user_cldw)}")
         return await interaction.response.send_message(f"There is no stock left.", ephemeral=True)
     else:
         
@@ -135,12 +124,6 @@ async def gen(interaction: discord.Interaction, service: str):
 
         await channel.send(embed=embd)
         return await interaction.response.send_message(embed=embd2, ephemeral=False)
-
-@gen.error
-async def gencmd_error(interaction: discord.Interaction, error):
-    if isinstance(error, app_commands.CommandOnCooldown):
-        embd=discord.Embed(title="Cooldown",description=f':no_entry_sign: This command is on cooldown, try again in {(error.retry_after/60):.2f} minutes.',color=config['colors']['error'])
-        await interaction.response.send_message(embed=embd, ephemeral=False)
 
 @tree.command(name = "addstock", description = "Add stock to database (admin only)", guild=discord.Object(id=config["guild-id"]))
 @app_commands.autocomplete(service=service_autcom)
