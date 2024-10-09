@@ -6,17 +6,14 @@
     "remove-capture-from-stock": true,
     "commands-give-cooldown": true,
 
-    "gen-channels": [12345],
+    "gen-channels": [0],
     "admins": [0],
     "roles": [
         {
             "id": 0,
-            "cooldown": 60,
-            "gen-access": ["netflix"]
-        },
-        {
-            "id": 0,
             "cooldown": 30,
+            "can-bulk-gen": true,
+            "bulk-gen-max": 5,
             "gen-access": ["all"]
         }
     ],

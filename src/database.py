@@ -42,6 +42,25 @@ async def getAccount(con, service):
     else:
         cursor.close()
         return False,None
+    
+async def getMultipleAccounts(con, service, count):
+    cursor = con.cursor()
+    name = f"accounts_{service}"
+    cursor.execute(f"SELECT COUNT(*) FROM {name}")
+    row_count = cursor.fetchone()[0]
+
+    if row_count >= count:
+        cursor.execute(f"SELECT * FROM {name} ORDER BY RANDOM() LIMIT {count}")
+        accounts = cursor.fetchall()
+        accounts_list = [account['combo'].strip() for account in accounts]
+        for account in accounts:
+            cursor.execute(f"DELETE FROM {name} WHERE combo = '{account[0]}'")
+        con.commit()
+        cursor.close()
+        return True, accounts_list, row_count
+    else:
+        cursor.close()
+        return False, None, row_count
 
 async def addStock(con, service, stock, remove_capture):
     cursor = con.cursor()

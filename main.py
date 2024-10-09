@@ -2,6 +2,7 @@ import discord, json, sqlite3
 from datetime import datetime, timedelta
 from discord import app_commands
 from typing import List
+from io import StringIO
 
 from src import database
 from src import utils
@@ -65,6 +66,73 @@ async def deleteservice(interaction: discord.Interaction, service: str):
     embd.set_footer(text=config['messages']['footer-msg'])
     
     return await interaction.response.send_message(embed=embd, ephemeral=True)
+
+@tree.command(name = "bulkgen", description = "Generate multiple accounts of your choice", guild=discord.Object(id=config["guild-id"]))
+@app_commands.autocomplete(service=service_autcom)
+async def bulkgen(interaction: discord.Interaction, service: str, amount: int):
+    global user_cooldowns
+    
+    if not is_everything_ready:
+        return await interaction.response.send_message("Bot is starting.", ephemeral=True)
+    
+    if service not in serviceList:
+        return await interaction.response.send_message(f'Invalid service.', ephemeral=True)
+
+    is_admin = interaction.user.id in config['admins']
+
+    if not is_admin and not interaction.channel_id in config["gen-channels"]:
+        channel_list = [f"<#{channel}>" for channel in config["gen-channels"]]
+        return await interaction.response.send_message(str(config['messages']['wrongchannel']) + ', '.join(channel_list), ephemeral=True)
+
+    utl_res, canbulkgen, max_gen_amnt = await utils.does_user_meet_requirements(interaction.user.roles, config, service, isbulkgen=True)
+    if not is_admin:
+        if not canbulkgen:
+            return await interaction.response.send_message(str(config['messages']['noperms']), ephemeral=True)
+        
+        if max_gen_amnt < amount:
+            return await interaction.response.send_message(f"You can't generate more than {max_gen_amnt} accounts per bulkgen.", ephemeral=True)
+        
+        if not utl_res:
+            return await interaction.response.send_message(str(config['messages']['noperms']), ephemeral=True)
+
+    # Cooldown
+    _user_cldw = None
+    has_cldw = await cooldown_manager.does_user_have_cooldown(user_cooldowns, interaction.user.id)
+    if interaction.user.id not in config['admins'] and not has_cldw:
+        _user_cldw = await cooldown_manager.get_role_user_cooldown(interaction)
+        if _user_cldw is not None:
+            user_cooldowns.append(f"{interaction.user.id}:{int(_user_cldw)}")
+    elif has_cldw:
+        _data = await cooldown_manager.getCooldownData(user_cooldowns, interaction.user.id)
+        if _data['stillHasCooldown']:
+            embd=discord.Embed(title="Cooldown",description=f':no_entry_sign: {_data["formatedCooldownMsg"]}',color=config['colors']['error'])
+            return await interaction.response.send_message(embed=embd, ephemeral=False)
+        elif _data['secondsTillEnd'] == 0:
+            user_cooldowns.remove(f"{interaction.user.id}:{int(_data['endTime'])}")
+            _user_cldw = await cooldown_manager.get_role_user_cooldown(interaction)
+            if _user_cldw is not None:
+                user_cooldowns.append(f"{interaction.user.id}:{int(_user_cldw)}")
+
+    success, accounts, account_left = await database.getMultipleAccounts(con, service, amount)
+    if not success:
+        if _user_cldw:
+            user_cooldowns.remove(f"{interaction.user.id}:{int(_user_cldw)}")
+        return await interaction.response.send_message(f"There is no stock left (´{account_left}´ accounts left).", ephemeral=True)
+    else:
+        
+        channel = await interaction.user.create_dm()
+        embd=discord.Embed(
+            title=f"Account Generated :label: ",
+            description=config['messages']['altsent'],
+            color=config['colors']['success']
+        )
+        embd.set_footer(text=config['messages']['footer-msg'],icon_url=interaction.user.avatar.url)
+
+        embd2=discord.Embed(title=f"`{service}` generated :label: ",description=':incoming_envelope: Check your DMs for the account.',color=config['colors']['success'])
+        embd2.set_footer(text=config['messages']['footer-msg'],icon_url=interaction.user.avatar.url)
+        embd2.set_image(url=config["generate-settings"]["gif-img-url"])
+        await channel.send(embed=embd, file=discord.File(fp=StringIO("\n".join([str(account) for account in accounts])), filename=f'{service}.txt'))
+        return await interaction.response.send_message(embed=embd2, ephemeral=False)
 
 @tree.command(name = "gen", description = "Generate an account of your choice", guild=discord.Object(id=config["guild-id"]))
 @app_commands.autocomplete(service=service_autcom)
