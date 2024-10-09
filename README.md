@@ -4,6 +4,7 @@ A discord bot which manages a database of accounts and provides a user-friendly 
 # Commands
 * `/stock` - Retrives the amount of stock left from the database.
 * `/gen [service]` - Generates an account and sends it to the users DMs.
+* `/bulkgen [service] [amount]` - Generates multiple accounts and sends them to the users DMs.
 * `/addstock [service] [upload txt file]` - Adds stock to the desired service. Checks for dupes.
 * `/createservice [service]` - Creates a service in the database.
 * `/deleteservice [service]` - Deletes a service from the database.
@@ -24,6 +25,8 @@ Do not paste this inside your config, it will not work.
         {
             "id": "Id of the role",
             "cooldown": "Here put the cooldown in seconds, this is a integer.",
+	    "can-bulk-gen": "boolean, switch if the user can use the bulkgen command or not. true - means they can.",
+            "bulk-gen-max": "int, how many accounts can they generate per bulkgen.",
             "gen-access": [
 		"Here put",
 		"The names of all the services u want the user with this",
