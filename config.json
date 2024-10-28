@@ -1,18 +1,18 @@
 {
-    "token": "DISCORD-BOT-TOKEN",
-    "guild-id": "DISCORD-SERVER-ID",
+    "token": "MTMwMDIzMzA2NTM4MTEwNTc4Ng.GqSaEF.OH2xiRHLajv80CVwNsSfHVSBYaBtSh32V5NYtU",
+    "guild-id": "1267543315071635649",
 
     "stock-command-silent": false,
     "remove-capture-from-stock": true,
     "commands-give-cooldown": true,
 
-    "gen-channels": [0],
-    "admins": [0],
+    "gen-channels": [prem-drops],
+    "admins": [652204056089198612],
     "roles": [
         {
-            "id": 0,
-            "cooldown": 30,
-            "can-bulk-gen": true,
+            "id": 1290107910914834534,
+            "cooldown": 120,
+            "can-bulk-gen": ,
             "bulk-gen-max": 5,
             "gen-access": ["all"]
         }
@@ -21,8 +21,8 @@
     "messages": {
         "noperms": "You do not have permissions to use this command.",
         "wrongchannel": ":thinking: ",
-        "altsent": "Thank you for using AtluzkaGEN",
-        "footer-msg": "github.com/Atluzka/account-gen-bot"
+        "altsent": "Thank you for using po_sq",
+        "footer-msg": ""
     },
 
     "generate-settings": {
