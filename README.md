@@ -64,7 +64,3 @@ account@gmail.com:test
 tester:hello|capture
 or just a piece of text
 ```
-
-# people you should not trust
-
-jinxz | jinxz.dev | UID: 757762431853527070 | SERVER-ID: 1291846478649888809 -- Selling my source code [Screenshot proof](https://i.imgur.com/RGaP1qX.png)
