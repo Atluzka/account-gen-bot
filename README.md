@@ -1,46 +1,47 @@
 # Account Generator Bot
+### THIS PROGRAM DOES NOT MAKE ACCOUNTS FOR YOU.
 A discord bot which manages a database of accounts and provides a user-friendly way to retrive them. Users can generate them thru an command and receive the account in their DMs. The bot ensures that each account is only distributed once, keeping the process organized and efficient.
 
 # Commands
-* `/stock` - Retrives the amount of stock left from the database.
-* `/gen [service]` - Generates an account and sends it to the users DMs.
-* `/bulkgen [service] [amount]` - Generates multiple accounts and sends them to the users DMs.
-* `/addstock [service] [upload txt file]` - Adds stock to the desired service. Checks for dupes.
-* `/createservice [service]` - Creates a service in the database.
-* `/deleteservice [service]` - Deletes a service from the database.
+Parameters marked with a star(*) are required.
+* `/addstock *[service] *[txt_file] [is_premium] [is_silent]` - Adds your lines to the database.
+* `/blacklist *[user] [status]` - Blacklist the user from using /gen.
+* `/bulkgen *[service] *[amount] *[is_premium] [is_silent]` - Admin only. Generate multiple accounts at a time.
+* `/clearservice *[service] [is_premium]` - Clear all lines from a specific stock.
+* `/cooldown reset *[user] [stage]` - Resets their current cooldown. (not custom cooldown)
+* `/cooldown set *[user] *[stage] [time_sec] [is_silent]` - Sets a custom cooldown for the user.
+* `/gen *[service] [is_premium]` - Gets a random line from the database and sends it to the user.
+* `/setnote *[user] *[note]` - Set a custom note for the user, u can see it when doing /user [user]
+* `/stock` - See, how many lines are in the database.
+* `/subscription add *[user] *[time_sec] [is_silent]` - Admin only. Add time to user's subscription.
+* `/subscription massadd *[time_sec] [is_silent]` - Admin only. Extend everyones subscription. (only people who had a sub)
+* `/subscription remove *[user] [is_silent]` - Admin only. Remove users subscription.
+* `/subscription set *[user] *[time_sec] [is_silent]` - Admin only. Set users premium subscription.
+* `/subscription view [user] [is_silent]` - View your(user only) or other people's(admin only) subscription.
+* `/user *[user]` - Admin only. View info about user.
 
-# Config
 
-Explanation to some things in the config.
-Do not paste this inside your config, it will not work.
-```json
-{
-    "token": "Here put your 'BOT TOKEN', NOT your 'ACCOUNT TOKEN'",
-    "guild-id": "This is self-explanatory, here goes the ID of your server/guild", 
-    "stock-command-silent": "boolean, makes the stock command only visible to the user who used the command."
-    "remove-capture-from-stock": "boolean, will remove '| your capture here' if you have it in the stock"
-    "gen-channels": "A list of all the channels where the /generate command can be used in."
-    "admins": "A list of admins, you must add yourself as an admin (your discord user id) in order to use admin only commands."
-    "roles": [
-        {
-            "id": "Id of the role",
-            "cooldown": "Here put the cooldown in seconds, this is a integer.",
-	    "can-bulk-gen": "boolean, switch if the user can use the bulkgen command or not. true - means they can.",
-            "bulk-gen-max": "int, how many accounts can they generate per bulkgen.",
-            "gen-access": [
-		"Here put",
-		"The names of all the services u want the user with this",
-		"role to have access to."
-		"You can also use 'all' if you want to give access to all the services"
-	    ]
-        }
-    ],
+# How to setup
+Having problems setting it up? You can contact me in discord. If I'm free I can help you with setup.
 
-    "messages": "Self-explanatory, here is the list of the messages which can be easily changed."
-    "generate-settings": { "gif-img-url": "HERE GOES THE DIRECT URL OF A PICTURE/GIF THAT WILL BE SENT EVERYTIME SOMEONE GENERATES SOMETHING" },
-    "maximum-file-size": "The maximum file size in bytes, default is 2mb"
-}
-```
+(This tutorial might be missing some stuff, if i forgot something)
+### 1. INSTALLING PYTHON (dont skip)
+First of all make sure you have python installed (3.11.6 recommended) on the machine you want to host the bot on. (Yes, you have to host the bot yourself. There is **NO** invite link.).
+When installing python, make sure to enabled 'ADD TO PATH' in the installer. If you have multiple versions of python installed, uninstall all of them and install 3.11.6 from [PYTHON](https://www.python.org/downloads/release/python-3116/)
+
+### 2. DOWNLOADING THE SOURCE
+Download all the files in the github. **DO NOT** edit any of the .py files (if you don't know what you're doing). Everything you want/need to edit is inside the config.json file.
+
+### 3. INSTALLING THE MODULES. (!)
+Open an console in the directory where the source is at and run the command: `pip install -r requirements.txt`
+
+### 4. CONFIG (!)
+In the config you need to put your **DISCORD BOT TOKEN** not your account token, which u can get from the [Discord Developer Portal](https://discord.com/developers/docs/). You make the bot and then go to the **BOT** tab and click on reset token, it will ask for password or code if you have mfa on your discord account. After confirming, copy the token and put it in your config. To get the guild-id aka your server id you need to enable developer mode in discord and right clicking on your server icon -> copy server id. Fill out the gen-channels, premium-gen-channels, admin-roles and the roles. You can also edit the footer message and the dm message in the config.
+
+### 5. INVITING THE BOT
+You can invite it from the Discord Developer Portal. Choose the bot you want to invite. Go to OAuth2 tab. Scroll down to 'OAuth2 URL Generator'. Enable 'bot' and 'applications.commands'. An invite link gets generated at the bottom. Copy it and open it in a new tab.
+Invite the bot to your server. Now you can run the main.py file.
+
 
 # Errors
 
@@ -51,9 +52,6 @@ Go to https://discord.dev and enable all the intents for your application. (disc
 
 ### 2. Not sending messages
 Make sure your intents are enabled and the bot has permission to send messages in the channel you're using the bot in. (You also have to specify the channels where the generate command can be used in thru the config). If the bot doesn't send a DM then make sure your dms are open.
-
-### 3. ModuleNotFound
-Install the requirered modules: **discord.py**, **typing**, **datetime**. If it doesn't work after that, reinstall python completely. I recommend downloading the 3.11.6 version from https://python.org. While installing make sure "ADD TO PATH" is enabled.
 
 ### 4. Addstock doesn't work
 It takes each line as an account from the txt file, so each account has to be on a seperate line.
