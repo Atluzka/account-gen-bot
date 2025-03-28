@@ -180,7 +180,7 @@ async def gen(interaction: discord.Interaction, service: str, is_premium: bool=F
         )
         return await interaction.response.send_message(embed=embed_error, ephemeral=True)
 
-    if not any(role_id in config['admin-roles'] for role_id in role_ids) and not interaction.channel_id in config["gen-channels"]:
+    if not any(role_id in config['admin-roles'] for role_id in role_ids) and not interaction.channel_id in config["gen-channels"] and not interaction.channel_id in config["premium-gen-channels"]:
         channel_list = [f"<#{channel}>" for channel in config["gen-channels"]]
         p_channel_list = [f"<#{channel}>" for channel in config["premium-gen-channels"]]
         embed_error = discord.Embed(
